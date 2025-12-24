@@ -1,0 +1,11 @@
+if SHIELD_CHARYBDIS
+config ZMK_KEYBOARD_NAME
+	default "Charybdis"
+
+config ZMK_SPLIT_BLE_ROLE_CENTRAL
+	default y
+
+endif
+
+
+

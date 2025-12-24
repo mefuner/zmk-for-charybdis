@@ -2,7 +2,7 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-    compatible = "zmk,shield-my_keyboard", "zmk,shield";
+    compatible = "zmk,shield-charybdis", "zmk,shield";
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
@@ -57,8 +57,8 @@
 // ∆Ù”√Nice!Nano I2C1◊‹œﬂ
 &i2c1 {
     status = "okay";
-    sda-pin = <26>;
-    scl-pin = <27>;
+    sda-pin = <20>;
+    scl-pin = <22>;
     clock-frequency = <400000>;
 };
 

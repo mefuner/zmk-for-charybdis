@@ -1,0 +1,4 @@
+config SHIELD_CHARYBDIS
+    def_bool $(shields_list_contains,charybdis)
+
+
