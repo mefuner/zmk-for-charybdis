@@ -1,4 +1,5 @@
-if SHIELD_CHARYBDIS
+if SHIELD_CHARYBDIS_RIGHT
+
 config ZMK_KEYBOARD_NAME
 	default "Charybdis"
 
