@@ -1,0 +1,72 @@
+#include <dt-bindings/zmk/matrix_transform.h>
+#include <dt-bindings/gpio/gpio.h>
+
+/ {
+    compatible = "zmk,shield-my_keyboard", "zmk,shield";
+
+    // 合并左右矩阵的扫描器（总矩阵：10行×5列，左5行+右5行，共享5列）
+    kscan0: kscan {
+        compatible = "zmk,kscan-gpio-matrix";
+        // 行引脚：左AW9523(P1-P5) + 右AW9523(P1-P5)，输出模式
+        row-gpios = <&aw9523_left 1 GPIO_ACTIVE_HIGH>,  // 左行1
+                    <&aw9523_left 2 GPIO_ACTIVE_HIGH>,  // 左行2
+                    <&aw9523_left 3 GPIO_ACTIVE_HIGH>,  // 左行3
+                    <&aw9523_left 4 GPIO_ACTIVE_HIGH>,  // 左行4
+                    <&aw9523_left 5 GPIO_ACTIVE_HIGH>,  // 左行5
+                    <&aw9523_right 1 GPIO_ACTIVE_HIGH>, // 右行1
+                    <&aw9523_right 2 GPIO_ACTIVE_HIGH>, // 右行2
+                    <&aw9523_right 3 GPIO_ACTIVE_HIGH>, // 右行3
+                    <&aw9523_right 4 GPIO_ACTIVE_HIGH>, // 右行4
+                    <&aw9523_right 5 GPIO_ACTIVE_HIGH>; // 右行5
+        // 列引脚：左/右AW9523共用P0-P5，输入模式，按下为低电平（GPIO_ACTIVE_LOW）
+        col-gpios = <&aw9523_left 0 GPIO_ACTIVE_LOW>,   // 列0
+                    <&aw9523_left 1 GPIO_ACTIVE_LOW>,   // 列1
+                    <&aw9523_left 2 GPIO_ACTIVE_LOW>,   // 列2
+                    <&aw9523_left 3 GPIO_ACTIVE_LOW>,   // 列3
+                    <&aw9523_left 4 GPIO_ACTIVE_LOW>;   // 列4（对应你说的P0-P5）
+        // 防抖参数（适配机械键盘）
+        debounce-press-ms = <5>;
+        debounce-release-ms = <5>;
+        // 扫描顺序（可选，默认行优先）
+        scan-direction = "row-first";
+    };
+
+    // 左AW9523（地址0x5A）
+    aw9523_left: aw9523@5a {
+        compatible = "awinic,aw9523";
+        reg = <0x5A>;                  // 左芯片I2C地址
+        i2c-parent = <&i2c1>;          // 绑定Nice!Nano的I2C1总线
+        gpio-controller;               // 声明为GPIO控制器
+        #gpio-cells = <2>;             // GPIO引脚参数格式（引脚号+属性）
+        awinic,mode = <0>;             // 0=GPIO模式，1=LED模式（必须设为0）
+    };
+
+    // 右AW9523（地址0x5B）
+    aw9523_right: aw9523@5b {
+        compatible = "awinic,aw9523";
+        reg = <0x5B>;                  // 右芯片I2C地址
+        i2c-parent = <&i2c1>;
+        gpio-controller;
+        #gpio-cells = <2>;
+        awinic,mode = <0>;
+    };
+
+    // 按键映射关联
+    zmk_keymap {
+        compatible = "zmk,keymap";
+        kscan = <&kscan0>;
+    };
+};
+
+// 启用Nice!Nano的I2C1总线（核心：必须开启）
+&i2c1 {
+    status = "okay";
+    sda-pin = <26>;                    // Nice!Nano的P0.26=SDA（默认常用引脚）
+    scl-pin = <27>;                    // Nice!Nano的P0.27=SCL
+    clock-frequency = <400000>;        // AW9523支持400kHz高速I2C
+};
+
+// 禁用默认矩阵扫描（避免冲突）
+&kscan {
+    status = "disabled";
+};
