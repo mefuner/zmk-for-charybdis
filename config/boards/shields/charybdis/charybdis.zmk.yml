@@ -9,5 +9,4 @@ features:
   - pointer
   - underglow
 siblings:
-  - charybdis_left
-  - charybdis_right
+  - charybdis
