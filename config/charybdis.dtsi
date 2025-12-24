@@ -61,8 +61,8 @@
 // 启用Nice!Nano的I2C1总线（核心：必须开启）
 &i2c1 {
     status = "okay";
-    sda-pin = <26>;                    // Nice!Nano的P0.26=SDA（默认常用引脚）
-    scl-pin = <27>;                    // Nice!Nano的P0.27=SCL
+    sda-pin = <20>;                    // Nice!Nano的P0.26=SDA（默认常用引脚）
+    scl-pin = <22>;                    // Nice!Nano的P0.27=SCL
     clock-frequency = <400000>;        // AW9523支持400kHz高速I2C
 };
 
