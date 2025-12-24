@@ -1,5 +1,97 @@
-on: [push, pull_request, workflow_dispatch]
+name: ZMK Build
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@main
+    name: Build Firmware
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        board_shield:
+          - "nice_nano:my_keyboard"  # 适配你的双AW9523键盘
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Cache West Modules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-west-modules
+        with:
+          path: |
+            ~/.cache/zephyr
+            ~/.cache/west
+            modules/
+            zephyr/
+            bootloader/
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('west.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+
+      - name: West Init
+        run: |
+          west init -l config
+          west update
+
+      - name: West Build
+        run: |
+          BOARD=${{ matrix.board_shield }}
+          IFS=':' read -r BOARD_NAME SHIELD_NAME <<< "$BOARD"
+          cd zmk/app
+          west build -s . -b ${BOARD_NAME} -- -DSHIELD=${SHIELD_NAME}
+
+      - name: Rename Firmware
+        run: |
+          BOARD=${{ matrix.board_shield }}
+          IFS=':' read -r BOARD_NAME SHIELD_NAME <<< "$BOARD"
+          if [ -f "zmk/app/build/zephyr/zmk.uf2" ]; then
+            mv zmk/app/build/zephyr/zmk.uf2 zmk/app/build/zephyr/${BOARD_NAME}-${SHIELD_NAME}-zmk.uf2
+          elif [ -f "zmk/app/build/zephyr/zmk.bin" ]; then
+            mv zmk/app/build/zephyr/zmk.bin zmk/app/build/zephyr/${BOARD_NAME}-${SHIELD_NAME}-zmk.bin
+          fi
+
+      - name: Upload Firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.board_shield }}-firmware
+          path: |
+            zmk/app/build/zephyr/*.uf2
+            zmk/app/build/zephyr/*.bin
+          retention-days: 90
+
+  release:
+    name: Release Firmware
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download All Firmware Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: firmware-artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Firmware Build
+          body: "Automatically built firmware for NiceNano + dual AW9523 keyboard."
+          files: |
+            firmware-artifacts/**/*.uf2
+            firmware-artifacts/**/*.bin
+          prerelease: false
+          overwrite: true
