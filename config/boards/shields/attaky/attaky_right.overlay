@@ -4,12 +4,6 @@
 / {
     compatible = "zmk,shield-attaky_right", "zmk,shield";
 
-    // 为I2C子设备声明地址/大小单元格数（旧版Zephyr必需）
-    i2c1 {
-        #address-cells = <1>;
-        #size-cells = <0>;
-    };
-
     // 自定义kscan节点（唯一扫描器）
     kscan: kscan {
         compatible = "zmk,kscan-gpio-matrix";
@@ -29,10 +23,10 @@
         debounce-release-ms = <5>;
     };
 
-    // AW9523（地址0x5B，补充长度字段0，适配旧版Zephyr）
+    // AW9523（地址0x5B，仅填地址，因为I2C1的#size-cells=0）
     aw9523_right: aw9523@5b {
         compatible = "awinic,aw9523";
-        reg = <0x5B 0>;  // 关键修改：地址+长度（I2C设备长度固定填0）
+        reg = <0x5B>;  // 改回仅地址，关键！
         i2c-parent = <&i2c1>;
         gpio-controller;
         #gpio-cells = <2>;
@@ -46,11 +40,11 @@
     };
 };
 
-// 启用I2C1（Nice Nano V2 P0.26=SDA, P0.27=SCL）
+// 启用I2C1（核心修改：#size-cells=0，告知解析器I2C设备无长度字段）
 &i2c1 {
     status = "okay";
-    #address-cells = <1>;  // 显式声明地址单元格数
-    #size-cells = <0>;     // I2C设备无size，填0
+    #address-cells = <1>;  // 地址占1个单元格
+    #size-cells = <0>;     // 无长度字段（关键！解决零长度reg报错）
     sda-pin = <26>;
     scl-pin = <27>;
     clock-frequency = <400000>;
