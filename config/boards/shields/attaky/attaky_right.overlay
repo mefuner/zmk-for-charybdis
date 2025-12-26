@@ -4,16 +4,22 @@
 / {
     compatible = "zmk,shield-attaky_right", "zmk,shield";
 
-    // 矩阵扫描器：AW9523 0x5B的P10-P14（行） + P00-P04（列）
-    kscan0: kscan {  // 自定义kscan0作为唯一扫描器，无需禁用默认kscan
+    // 为I2C子设备声明地址/大小单元格数（旧版Zephyr必需）
+    i2c1 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+    };
+
+    // 自定义kscan节点（唯一扫描器）
+    kscan: kscan {
         compatible = "zmk,kscan-gpio-matrix";
-        // 行：P10-P14（输出，高电平有效）
+        // 行：AW9523 P10-P14（输出高电平有效）
         row-gpios = <&aw9523_right 10 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 11 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 12 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 13 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 14 GPIO_ACTIVE_HIGH>;
-        // 列：P00-P04（输入，按下列为低电平）
+        // 列：AW9523 P00-P04（输入低电平有效）
         col-gpios = <&aw9523_right 0 GPIO_ACTIVE_LOW>,
                     <&aw9523_right 1 GPIO_ACTIVE_LOW>,
                     <&aw9523_right 2 GPIO_ACTIVE_LOW>,
@@ -23,32 +29,29 @@
         debounce-release-ms = <5>;
     };
 
-    // AW9523右键盘（地址0x5B）
+    // AW9523（地址0x5B，补充长度字段0，适配旧版Zephyr）
     aw9523_right: aw9523@5b {
         compatible = "awinic,aw9523";
-        reg = <0x5B>;          // 硬件地址0x5B
-        i2c-parent = <&i2c1>;  // 绑定Nice Nano V2的I2C1
+        reg = <0x5B 0>;  // 关键修改：地址+长度（I2C设备长度固定填0）
+        i2c-parent = <&i2c1>;
         gpio-controller;
         #gpio-cells = <2>;
-        awinic,mode = <0>;     // 强制GPIO模式（禁用LED功能）
+        awinic,mode = <0>;  // 强制GPIO模式
     };
 
-    // 关联按键映射到自定义kscan0
+    // 关联按键映射
     zmk_keymap {
         compatible = "zmk,keymap";
-        kscan = <&kscan0>;
+        kscan = <&kscan>;
     };
 };
 
-// 启用Nice Nano V2的I2C1（P0.26=SDA, P0.27=SCL）
+// 启用I2C1（Nice Nano V2 P0.26=SDA, P0.27=SCL）
 &i2c1 {
     status = "okay";
+    #address-cells = <1>;  // 显式声明地址单元格数
+    #size-cells = <0>;     // I2C设备无size，填0
     sda-pin = <26>;
     scl-pin = <27>;
     clock-frequency = <400000>;
 };
-
-// 【删除这部分代码】因为默认没有kscan节点，无需禁用
-// &kscan {
-//     status = "disabled";
-// };
