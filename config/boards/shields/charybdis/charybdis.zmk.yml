@@ -3,11 +3,11 @@ id: charybdis
 name: Charybdis
 type: shield
 url: https://github.com/Bastardkb/Charybdis/
-requires: [pro_micro]
+requires: [pro_micro, nice_nano_v2]
 features:
   - keys
-  - pointer
-  - underglow
+#  - pointer
+#  - underglow
 siblings:
   - charybdis_left
   - charybdis_right
