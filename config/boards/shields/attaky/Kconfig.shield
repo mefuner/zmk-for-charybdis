@@ -1,0 +1,5 @@
+config SHIELD_ATTAKY_LEFT
+    def_bool $(shields_list_contains,attaky_left)
+
+config SHIELD_ATTAKY_RIGHT
+    def_bool $(shields_list_contains,attaky_right)

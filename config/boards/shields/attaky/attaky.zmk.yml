@@ -1,6 +1,6 @@
 file_format: "1"
-id: charybdis
-name: Charybdis
+id: attaky
+name: attaky
 type: shield
 url: https://github.com/Bastardkb/Charybdis/
 requires: [pro_micro, nice_nano_v2]
@@ -9,5 +9,5 @@ features:
 #  - pointer
 #  - underglow
 siblings:
-  - charybdis_left
-  - charybdis_right
+  - attaky_left
+  - attaky_right

@@ -2,18 +2,18 @@
 #include <dt-bindings/gpio/gpio.h>
 
 / {
-    compatible = "zmk,shield-charybdis_right", "zmk,shield";
+    compatible = "zmk,shield-attaky_right", "zmk,shield";
 
-    // ¾ØÕóÉ¨ÃèÆ÷£ºAW9523 0x5BµÄP10-P14£¨ĞĞ£© + P00-P04£¨ÁĞ£©
-    kscan0: kscan {
+    // çŸ©é˜µæ‰«æå™¨ï¼šAW9523 0x5Bçš„P10-P14ï¼ˆè¡Œï¼‰ + P00-P04ï¼ˆåˆ—ï¼‰
+    kscan0: kscan {  // è‡ªå®šä¹‰kscan0ä½œä¸ºå”¯ä¸€æ‰«æå™¨ï¼Œæ— éœ€ç¦ç”¨é»˜è®¤kscan
         compatible = "zmk,kscan-gpio-matrix";
-        // ĞĞ£ºP10-P14£¨Êä³ö£¬¸ßµçÆ½ÓĞĞ§£©
+        // è¡Œï¼šP10-P14ï¼ˆè¾“å‡ºï¼Œé«˜ç”µå¹³æœ‰æ•ˆï¼‰
         row-gpios = <&aw9523_right 10 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 11 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 12 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 13 GPIO_ACTIVE_HIGH>,
                     <&aw9523_right 14 GPIO_ACTIVE_HIGH>;
-        // ÁĞ£ºP00-P04£¨ÊäÈë£¬°´ÏÂÁĞÎªµÍµçÆ½£©
+        // åˆ—ï¼šP00-P04ï¼ˆè¾“å…¥ï¼ŒæŒ‰ä¸‹åˆ—ä¸ºä½ç”µå¹³ï¼‰
         col-gpios = <&aw9523_right 0 GPIO_ACTIVE_LOW>,
                     <&aw9523_right 1 GPIO_ACTIVE_LOW>,
                     <&aw9523_right 2 GPIO_ACTIVE_LOW>,
@@ -23,24 +23,24 @@
         debounce-release-ms = <5>;
     };
 
-    // AW9523ÓÒ¼üÅÌ£¨µØÖ·0x5B£©
+    // AW9523å³é”®ç›˜ï¼ˆåœ°å€0x5Bï¼‰
     aw9523_right: aw9523@5b {
         compatible = "awinic,aw9523";
-        reg = <0x5B>;          // Ó²¼şµØÖ·0x5B
-        i2c-parent = <&i2c1>;  // °ó¶¨Nice Nano V2µÄI2C1
+        reg = <0x5B>;          // ç¡¬ä»¶åœ°å€0x5B
+        i2c-parent = <&i2c1>;  // ç»‘å®šNice Nano V2çš„I2C1
         gpio-controller;
         #gpio-cells = <2>;
-        awinic,mode = <0>;     // Ç¿ÖÆGPIOÄ£Ê½£¨½ûÓÃLED¹¦ÄÜ£©
+        awinic,mode = <0>;     // å¼ºåˆ¶GPIOæ¨¡å¼ï¼ˆç¦ç”¨LEDåŠŸèƒ½ï¼‰
     };
 
-    // ¹ØÁª°´¼üÓ³Éä
+    // å…³è”æŒ‰é”®æ˜ å°„åˆ°è‡ªå®šä¹‰kscan0
     zmk_keymap {
         compatible = "zmk,keymap";
         kscan = <&kscan0>;
     };
 };
 
-// ÆôÓÃNice Nano V2µÄI2C1£¨P0.26=SDA, P0.27=SCL£©
+// å¯ç”¨Nice Nano V2çš„I2C1ï¼ˆP0.26=SDA, P0.27=SCLï¼‰
 &i2c1 {
     status = "okay";
     sda-pin = <26>;
@@ -48,7 +48,7 @@
     clock-frequency = <400000>;
 };
 
-// ½ûÓÃÄ¬ÈÏ¾ØÕóÉ¨Ãè£¨±ÜÃâ³åÍ»£©
-&kscan {
-    status = "disabled";
-};
+// ã€åˆ é™¤è¿™éƒ¨åˆ†ä»£ç ã€‘å› ä¸ºé»˜è®¤æ²¡æœ‰kscanèŠ‚ç‚¹ï¼Œæ— éœ€ç¦ç”¨
+// &kscan {
+//     status = "disabled";
+// };
