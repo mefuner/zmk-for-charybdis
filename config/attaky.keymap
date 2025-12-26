@@ -6,12 +6,12 @@
         compatible = "zmk,keymap";
         default_layer {
             bindings = <
-                // 右键盘5行5列（对应AW9523 P10-P14行 + P00-P04列）
+
                 &kp 5     &kp 6     &kp 7     &kp 8     &kp 9
                 &kp T     &kp Y     &kp U     &kp I     &kp O
                 &kp G     &kp H     &kp J     &kp K     &kp L
-                &kp B     &kp N     &kp M     &kp COMM  &kp DOT
-                &kp ENT   &kp RALT  &kp RGUI  &kp RCTRL &kp DEL
+                 &kp G     &kp H     &kp J     &kp K     &kp L
+                &kp G     &kp H     &kp J     &kp K     &kp L
             >;
         };
     };
